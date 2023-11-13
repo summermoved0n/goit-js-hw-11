@@ -1,7 +1,7 @@
-import axios from 'axios';
+import './css/styles.css'
+// import axios from 'axios';
 import Notiflix from 'notiflix';
 import PixabayApiService from './pixabay-api';
-// import hitsTpl from 'hits.hps'
 
 const pixabayService = new PixabayApiService();
 
@@ -27,34 +27,37 @@ function onLoadMore() {
 }
 
 function makeMarkup(hits) {
-  console.log(hits)
-  const markup = `
+  console.log(hits);
+  hits.forEach(element => {
+    const markup = `
   <div class="photo-card">
         <img
-          src="${hits.webformatURL}"
-          alt="${hits.tags}"
+          src="${element.webformatURL}"
+          alt="${element.tags}"
           loading="lazy"
           width=""
         />
         <div class="info">
           <p class="info-item">
             <b class="main-text">Likes</b>
-            <span class="lower-text">${hits.likes}</span>
+            <span class="lower-text">${element.likes}</span>
           </p>
           <p class="info-item">
             <b class="main-text">Views</b>
-            <span class="lower-text">${hits.views}</span>
+            <span class="lower-text">${element.views}</span>
           </p>
           <p class="info-item">
             <b class="main-text">Comments</b>
-            <span class="lower-text">${hits.comments}</span>
+            <span class="lower-text">${element.comments}</span>
           </p>
           <p class="info-item">
             <b class="main-text">Downloads</b>
-            <span class="lower-text">${hits.downloads}</span>
+            <span class="lower-text">${element.downloads}</span>
           </p>
         </div>
       </div>
     `;
-  return refs.galleryBox.insertAdjacentHTML('beforeend', markup);
+    refs.galleryBox.insertAdjacentHTML('beforeend', markup);
+  });
+  
 }
