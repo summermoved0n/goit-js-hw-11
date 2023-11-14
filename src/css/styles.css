@@ -7,6 +7,7 @@ body {
 img {
   display: block;
   width: 100%;
+  height: 220px;
 }
 
 .form-section {
@@ -73,4 +74,23 @@ img {
   color: #fff;
   display: block;
   margin: 20px auto;
+}
+
+.load-more:disabled{
+  background-color: rgba(128, 128, 128, 0.212);
+  color:#000
+}
+
+.no-more-resalts{
+  width: 400px;
+  display: flex;
+  margin: 20px auto;
+  border: 1px solid black;
+  padding: 5px;
+  justify-content: center;
+  border-radius: 15px;
+}
+
+.is-hidden{
+  display: none;
 }

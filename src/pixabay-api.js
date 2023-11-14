@@ -19,10 +19,26 @@ export default class PixabayApiService {
 
     return await axios
       .get(url)
-      .then(response => response.data)
+      .then(response => {
+        return response.data;
+      })
       .then(data => {
         this.incrementPage();
         return data.hits;
+      })
+      .catch(error => console.log(error));
+  }
+
+  fetchTotalHits() {
+    const API_URL = 'https://pixabay.com/api/';
+    const API_KEY = '40638542-671402e9a996bdf1173ac4708';
+    const url = `${API_URL}?key=${API_KEY}&q=${this.searchQuery}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40&page=${this.page}`;
+
+    return axios
+      .get(url)
+      .then(response => {
+        console.log(response.data.totalHits);
+        return response.data.totalHits;
       })
       .catch(error => console.log(error));
   }
