@@ -1,4 +1,4 @@
-import './css/styles.css'
+import './css/styles.css';
 // import axios from 'axios';
 import Notiflix from 'notiflix';
 import PixabayApiService from './pixabay-api';
@@ -9,21 +9,42 @@ const refs = {
   searchForm: document.querySelector('.search-form'),
   galleryBox: document.querySelector('.gallery'),
   loadMoreBtn: document.querySelector('.load-more'),
+  searchBtn: document.querySelector('.search-btn'),
 };
 
 refs.searchForm.addEventListener('submit', onSubmit);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
+refs.searchForm.addEventListener('input', e => {
+  const input = e.currentTarget.elements.searchQuery.value;
+  if (input !== '') {
+    refs.searchBtn.disabled = false;
+  } else {
+    refs.searchBtn.disabled = true;
+  }
+});
 
 function onSubmit(e) {
   e.preventDefault();
-
   pixabayService.query = e.currentTarget.elements.searchQuery.value;
   pixabayService.resetPage();
-  pixabayService.fetchPixabay().then(makeMarkup);
+  pixabayService.fetchPixabay().then(hits => {
+    if (hits.length === 0) {
+      clearGalleryBox();
+      Notiflix.Notify.failure(
+        "We're sorry, but you've reached the end of search results."
+      );
+    }
+    clearGalleryBox();
+    makeMarkup(hits);
+  });
 }
 
 function onLoadMore() {
   pixabayService.fetchPixabay().then(makeMarkup);
+}
+
+function clearGalleryBox() {
+  refs.galleryBox.innerHTML = '';
 }
 
 function makeMarkup(hits) {
@@ -35,7 +56,6 @@ function makeMarkup(hits) {
           src="${element.webformatURL}"
           alt="${element.tags}"
           loading="lazy"
-          width=""
         />
         <div class="info">
           <p class="info-item">
@@ -59,5 +79,4 @@ function makeMarkup(hits) {
     `;
     refs.galleryBox.insertAdjacentHTML('beforeend', markup);
   });
-  
 }

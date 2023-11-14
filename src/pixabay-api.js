@@ -1,12 +1,17 @@
 import axios from 'axios';
 
 export default class PixabayApiService {
+  // static API_URL = 'https://pixabay.com/api/';
+  // static API_KEY = '40638542-671402e9a996bdf1173ac4708';
+
   constructor() {
+    // this.API_URL = 'https://pixabay.com/api/';
+    // this.API_KEY = '40638542-671402e9a996bdf1173ac4708';
     this.searchQuery = '';
     this.page = 1;
   }
 
-    async fetchPixabay() {
+  async fetchPixabay() {
     console.log(this);
     const API_URL = 'https://pixabay.com/api/';
     const API_KEY = '40638542-671402e9a996bdf1173ac4708';
@@ -17,7 +22,6 @@ export default class PixabayApiService {
       .then(response => response.data)
       .then(data => {
         this.incrementPage();
-        // console.log(data.hits)
         return data.hits;
       })
       .catch(error => console.log(error));
