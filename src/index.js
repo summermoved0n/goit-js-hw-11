@@ -1,11 +1,10 @@
 import './css/styles.css';
-// import axios from 'axios';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import Notiflix from 'notiflix';
 import PixabayApiService from './pixabay-api';
 
-let gallery = new SimpleLightbox('.gallery a')
+let gallery = new SimpleLightbox('.gallery a');
 const pixabayService = new PixabayApiService();
 
 const refs = {
@@ -31,13 +30,9 @@ function onSubmit(e) {
   e.preventDefault();
   pixabayService.query = e.currentTarget.elements.searchQuery.value;
   pixabayService.resetPage();
-  const successMsg = pixabayService.fetchTotalHits().then(response => {
-    console.log(response);
-    return response;
-  });
-  console.log(successMsg.then(res => res));
-  pixabayService.fetchPixabay().then(hits => {
-    if (hits.length === 0) {
+  pixabayService.fetchPixabay().then(data => {
+    console.log(data)
+    if (data.hits.length === 0) {
       hideNoMoreResaltsText();
       hideLoadBtn();
       clearGalleryBox();
@@ -45,26 +40,27 @@ function onSubmit(e) {
         'Sorry, there are no images matching your search query. Please try again.'
       );
     } else {
-      Notiflix.Notify.success(`Hooray! We found ${successMsg} images.`);
+      Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
       hideNoMoreResaltsText();
       showLoadBtn();
       enableLoadBtn();
       clearGalleryBox();
-      makeMarkup(hits);
+      makeMarkup(data);
     }
   });
 }
 
 function onLoadMore() {
   disableLoadBtn();
-  pixabayService.fetchPixabay().then(hits => {
-    if (hits.length === 0) {
+  pixabayService.fetchPixabay().then(data => {
+    console.log(data)
+    if (data.hits.length === 0) {
       showNoMoreResaltsText();
       hideLoadBtn();
     } else {
       gallery.refresh();
       enableLoadBtn();
-      makeMarkup(hits);
+      makeMarkup(data);
     }
   });
 }
@@ -89,6 +85,8 @@ function enableLoadBtn() {
 function disableLoadBtn() {
   refs.loadMoreBtn.disabled = true;
   refs.loadMoreBtn.textContent = 'Loading...';
+  const markup = `<span class="loader"></span>`;
+  refs.loadMoreBtn.insertAdjacentHTML('afterbegin', markup)
 }
 
 function showNoMoreResaltsText() {
@@ -99,9 +97,8 @@ function hideNoMoreResaltsText() {
   refs.noMoreResalt.classList.add('is-hidden');
 }
 
-function makeMarkup(hits) {
-  console.log(hits);
-  hits.forEach(element => {
+function makeMarkup(data) {
+  data.hits.forEach(element => {
     const markup = `
   <div class="photo-card">
   <a class="gallery__link" href="${element.largeImageURL}">
