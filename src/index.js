@@ -4,8 +4,8 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 import Notiflix from 'notiflix';
 import PixabayApiService from './pixabay-api';
 
-let gallery = new SimpleLightbox('.gallery a');
 const pixabayService = new PixabayApiService();
+// let gallery;
 
 const refs = {
   searchForm: document.querySelector('.search-form'),
@@ -26,12 +26,14 @@ refs.searchForm.addEventListener('input', e => {
   }
 });
 
-function onSubmit(e) {
+async function onSubmit(e) {
   e.preventDefault();
   pixabayService.query = e.currentTarget.elements.searchQuery.value;
   pixabayService.resetPage();
-  pixabayService.fetchPixabay().then(data => {
-    console.log(data)
+
+  try {
+    const data = await pixabayService.fetchPixabay();
+
     if (data.hits.length === 0) {
       hideNoMoreResaltsText();
       hideLoadBtn();
@@ -47,22 +49,29 @@ function onSubmit(e) {
       clearGalleryBox();
       makeMarkup(data);
     }
-  });
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-function onLoadMore() {
+async function onLoadMore() {
   disableLoadBtn();
-  pixabayService.fetchPixabay().then(data => {
-    console.log(data)
+  
+  try {
+    const data = await pixabayService.fetchPixabay()
+
+    console.log(data);
     if (data.hits.length === 0) {
       showNoMoreResaltsText();
       hideLoadBtn();
     } else {
-      gallery.refresh();
       enableLoadBtn();
       makeMarkup(data);
+      smoothScrol();
     }
-  });
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 function clearGalleryBox() {
@@ -86,7 +95,7 @@ function disableLoadBtn() {
   refs.loadMoreBtn.disabled = true;
   refs.loadMoreBtn.textContent = 'Loading...';
   const markup = `<span class="loader"></span>`;
-  refs.loadMoreBtn.insertAdjacentHTML('afterbegin', markup)
+  refs.loadMoreBtn.insertAdjacentHTML('afterbegin', markup);
 }
 
 function showNoMoreResaltsText() {
@@ -132,5 +141,17 @@ function makeMarkup(data) {
   });
   let gallery = new SimpleLightbox('.gallery a', {
     captionDelay: 250,
+  });
+  gallery.refresh();
+}
+
+function smoothScrol() {
+  const { height: cardHeight } = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
   });
 }
