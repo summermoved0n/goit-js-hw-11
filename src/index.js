@@ -5,7 +5,7 @@ import Notiflix from 'notiflix';
 import PixabayApiService from './pixabay-api';
 
 const pixabayService = new PixabayApiService();
-// let gallery;
+// let totalPage;
 
 const refs = {
   searchForm: document.querySelector('.search-form'),
@@ -33,15 +33,23 @@ async function onSubmit(e) {
 
   try {
     const data = await pixabayService.fetchPixabay();
+    pixabayService.totalPage = Math.ceil(data.totalHits / 40);
 
     if (data.hits.length === 0) {
+      clearGalleryBox();
       hideNoMoreResaltsText();
       hideLoadBtn();
-      clearGalleryBox();
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
+    } else if (data.totalHits <= 40) {
+      Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
+      clearGalleryBox();
+      showNoMoreResaltsText();
+      hideLoadBtn();
+      makeMarkup(data);
     } else {
+      console.log(pixabayService.totalPage);
       Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
       hideNoMoreResaltsText();
       showLoadBtn();
@@ -56,21 +64,23 @@ async function onSubmit(e) {
 
 async function onLoadMore() {
   disableLoadBtn();
-  
+
   try {
-    const data = await pixabayService.fetchPixabay()
+    const data = await pixabayService.fetchPixabay();
 
     console.log(data);
-    if (data.hits.length === 0) {
+    if (pixabayService.page >= pixabayService.totalPage) {
+      makeMarkup(data);
       showNoMoreResaltsText();
       hideLoadBtn();
+      smoothScrol();
     } else {
       enableLoadBtn();
       makeMarkup(data);
       smoothScrol();
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 }
 

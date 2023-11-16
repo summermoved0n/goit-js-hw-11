@@ -4,6 +4,7 @@ export default class PixabayApiService {
   constructor() {
     this.searchQuery = '';
     this.page = 1;
+    this.totalPage = 1;
   }
 
   async fetchPixabay() {
@@ -15,6 +16,7 @@ export default class PixabayApiService {
 
       const response = await axios.get(url)
       const data = await response.data
+      console.log(data)
       if (data) {
         this.incrementPage();
       } return data
